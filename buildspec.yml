@@ -6,17 +6,15 @@ phases:
       # 1. Node.jsの依存関係をインストール
       - echo Installing Serverless Framework and dependencies...
       - npm install
-      - npm install -g serverless
+      # 2. Serverless Frameworkを安定版のバージョン3系に固定してインストール
+      - npm install -g serverless@3 
 
   build:
     commands:
-      # 2. ユニットテスト（あれば実行）
-      # - npm test
       # 3. Serverless Frameworkを使ってAWSにデプロイ
       - echo Deploying via Serverless Framework...
       - sls deploy --stage dev
 
 artifacts:
   files:
-    # デプロイ後にCodePipelineに渡す成果物はないため空でOK
     - '**/*'
