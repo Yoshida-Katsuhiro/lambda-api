@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      # 1. Node.jsの依存関係をインストール
+      - echo Installing Serverless Framework and dependencies...
+      - npm install
+      - npm install -g serverless
+
+  build:
+    commands:
+      # 2. ユニットテスト（あれば実行）
+      # - npm test
+      # 3. Serverless Frameworkを使ってAWSにデプロイ
+      - echo Deploying via Serverless Framework...
+      - sls deploy --stage dev
+
+artifacts:
+  files:
+    # デプロイ後にCodePipelineに渡す成果物はないため空でOK
+    - '**/*'
