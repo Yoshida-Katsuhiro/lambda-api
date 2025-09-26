@@ -1,0 +1,49 @@
+service: node-project
+
+provider:
+  name: aws
+  runtime: nodejs20.x # Node.jsの最新LTSバージョン
+  region: ap-northeast-1
+  stage: dev
+  environment:
+    DATABASE_USER: ${env:DATABASE_USER}
+    DATABASE_PASSWORD: ${env:DATABASE_PASSWORD}
+    DATABASE_HOST: ${env:DATABASE_HOST}
+    DATABASE_NAME: ${env:DATABASE_NAME}
+  vpc:
+    securityGroupIds:
+      - sg-0c783dc1db068f8db 
+    subnetIds:
+      - subnet-0823a713c079e31aa
+      - subnet-0b0698f06dfeac23b
+      - subnet-0da4b96f159885f74
+
+
+functions:
+  app:
+    handler: app.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
+          cors: true
+          # private: true は削除
+          authorizer: aws_iam  # ← これを追加
+
+      # POST /products の設定
+      - http:
+          path: /products
+          method: post
+          cors: true
+          # private: true は削除
+          authorizer: aws_iam  # ← これを追加
+
+      # DELETE /products/{id} の設定
+      - http:
+          path: /products/{id}
+          method: delete
+          cors: true
+          # private: true は削除
+          authorizer: aws_iam  # ← これを追加
+
+      # 既存の GET /products の設定も同様に authorizer: aws_iam を追加してください
