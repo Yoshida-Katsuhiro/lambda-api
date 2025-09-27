@@ -11,9 +11,15 @@ phases:
 
   build:
     commands:
-      # 3. Serverless Frameworkを使ってAWSにデプロイ
+      # 1. 💡 データベースマイグレーションの実行
+      # プロジェクト内でマイグレーション用スクリプトが定義されていると仮定
+      - echo Running database migrations...
+      - npm run migrate # または npx knex migrate:latest など
+
+      # 2. Serverless Frameworkを使ってRDSとLambdaをデプロイ
       - echo Deploying via Serverless Framework...
-      - sls deploy --stage dev
+      - sls deploy --stage dev 
+  
 
 artifacts:
   files:

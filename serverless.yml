@@ -8,7 +8,7 @@ provider:
   environment:
     DATABASE_USER: ${env:DATABASE_USER}
     DATABASE_PASSWORD: ${env:DATABASE_PASSWORD}
-    DATABASE_HOST: ${env:DATABASE_HOST}
+    DATABASE_HOST: { "Fn::GetAtt": ["MyDatabase", "Endpoint.Address"] }
     DATABASE_NAME: ${env:DATABASE_NAME}
   vpc:
     securityGroupIds:
@@ -47,3 +47,50 @@ functions:
           authorizer: aws_iam  # ← これを追加
 
       # 既存の GET /products の設定も同様に authorizer: aws_iam を追加してください
+resources:
+  Resources:
+    # 💡 データベースインスタンスの定義
+    
+     MySecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Security group for RDS allowing access from Lambda
+        VpcId: vpc-xxxxxxxxxxxxxxxxx # 以前手動で作ったVPCのIDを指定
+        SecurityGroupIngress:
+          - IpProtocol: tcp             # 接続プロトコル
+            FromPort: 3306             # データベースのポート (MySQLなら3306)
+            ToPort: 3306               # データベースのポート
+            SourceSecurityGroupId: sg-0c783dc1db068f8db # 👈 許可したい Lambda用のセキュリティグループID
+      
+    
+    
+    
+    MyDBSubnetGroup:
+      Type: AWS::RDS::DBSubnetGroup
+      Properties:
+        SubnetIds:
+          - subnet-0823a713c079e31aa
+          - subnet-0b0698f06dfeac23b
+          - subnet-0da4b96f159885f74
+        DBSubnetGroupName: my-db-subnet-group
+    
+    
+    
+    
+    MyDatabase:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        # RDSのエンジン、バージョン、インスタンスサイズなどを指定
+        Engine: postgres
+        DBInstanceClass: db.t3.micro
+        MasterUsername: ${env:DATABASE_USER}
+        MasterUserPassword: ${env:DATABASE_PASSWORD}
+        AllocatedStorage: 20
+        # データベース名 (任意)
+        DBName: ${env:DATABASE_NAME}
+        # セキュリティグループとサブネットグループの設定も必要
+        # VpcSecurityGroups: 
+        #   - { Ref: MySecurityGroup }
+        # DBSubnetGroupName: MyDBSubnetGroup      
+        DBSubnetGroupName: { Ref: MyDBSubnetGroup }
+        
