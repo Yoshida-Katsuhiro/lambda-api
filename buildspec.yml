@@ -11,8 +11,11 @@ phases:
 
   build:
     commands:
-      # 1. 💡 データベースマイグレーションの実行
-      # プロジェクト内でマイグレーション用スクリプトが定義されていると仮定
+      - echo Cleaning up previous deployment artifacts...
+      # 一度サービスを完全に削除するコマンド（スタックとS3バケットを消す）
+      - serverless remove --stage ${STAGE} --region ${AWS_DEFAULT_REGION} || true 
+      - echo Deploying via Serverless Framework...
+      - serverless deploy --stage ${STAGE} --region ${AWS_DEFAULT_REGION}
 
 
       # 2. Serverless Frameworkを使ってRDSとLambdaをデプロイ
