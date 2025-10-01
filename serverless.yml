@@ -20,7 +20,7 @@ provider:
   # VPC設定はbuildspecからVPC_IDを取得
   vpc:
     securityGroupIds:
-      - sg-0c783dc1db068f8db # 👈 既存のセキュリティグループID
+      - sg-0c783dc1db068f8db # 👈 既存のLambda用セキュリティグループID
     subnetIds:
       - subnet-0823a713c079e31aa
       - subnet-0b0698f06dfeac23b
@@ -63,8 +63,7 @@ resources:
     MyDBSubnetGroup:
       Type: AWS::RDS::DBSubnetGroup
       Properties:
-        # 🚨 修正点 🚨 説明文 (Description) を追加
-        DBSubnetGroupDescription: Subnets for RDS private access
+        DBSubnetGroupDescription: Subnets for RDS private access # 👈 前回の修正
         SubnetIds:
           - subnet-0823a713c079e31aa
           - subnet-0b0698f06dfeac23b
@@ -76,10 +75,12 @@ resources:
       Properties:
         Engine: postgres
         DBInstanceClass: db.t3.micro
-        MasterUsername: ${self:custom.dbUser} # 👈 customセクションから参照
-        MasterUserPassword: ${self:custom.dbPassword} # 👈 customセクションから参照
+        MasterUsername: ${self:custom.dbUser}
+        MasterUserPassword: ${self:custom.dbPassword}
         AllocatedStorage: 20
-        DBName: ${env:DATABASE_NAME} # 👈 buildspecから直接渡す
+        DBName: ${env:DATABASE_NAME}
         DBSubnetGroupName: { Ref: MyDBSubnetGroup }
+        
+        # 🚨 最終修正点 🚨 参照方法を { Ref: MySecurityGroup } から !Ref MySecurityGroup に変更
         VpcSecurityGroups: 
-          - { Ref: MySecurityGroup } # 👈 MySecurityGroupを参照
+          - !Ref MySecurityGroup
