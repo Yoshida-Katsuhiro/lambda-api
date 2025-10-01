@@ -63,7 +63,7 @@ resources:
     MyDBSubnetGroup:
       Type: AWS::RDS::DBSubnetGroup
       Properties:
-        DBSubnetGroupDescription: Subnets for RDS private access # 👈 前回の修正
+        DBSubnetGroupDescription: Subnets for RDS private access
         SubnetIds:
           - subnet-0823a713c079e31aa
           - subnet-0b0698f06dfeac23b
@@ -81,6 +81,6 @@ resources:
         DBName: ${env:DATABASE_NAME}
         DBSubnetGroupName: { Ref: MyDBSubnetGroup }
         
-        # 🚨 最終修正点 🚨 参照方法を { Ref: MySecurityGroup } から !Ref MySecurityGroup に変更
-        VpcSecurityGroups: 
+        # 最終修正: VpcSecurityGroupIds (Ids付き) が正しいプロパティ名
+        VpcSecurityGroupIds: 
           - !Ref MySecurityGroup
