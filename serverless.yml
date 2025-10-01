@@ -1,7 +1,6 @@
 service: node-project
 
 custom:
-  # DBのマスターユーザー情報をここで定義。buildspecから渡される
   dbUser: ${env:DATABASE_USER}
   dbPassword: ${env:DATABASE_PASSWORD}
 
@@ -11,16 +10,15 @@ provider:
   region: ap-northeast-1
   stage: dev
   environment:
-    # Lambdaの環境変数として利用
     DATABASE_USER: ${self:custom.dbUser}
     DATABASE_PASSWORD: ${self:custom.dbPassword}
     DATABASE_HOST: { "Fn::GetAtt": ["MyDatabase", "Endpoint.Address"] }
     DATABASE_NAME: ${env:DATABASE_NAME}
   
-  # VPC設定はbuildspecからVPC_IDを取得
   vpc:
+    # 既存のLambda用セキュリティグループIDをそのまま利用
     securityGroupIds:
-      - sg-0c783dc1db068f8db # 👈 既存のLambda用セキュリティグループID
+      - sg-0c783dc1db068f8db 
     subnetIds:
       - subnet-0823a713c079e31aa
       - subnet-0b0698f06dfeac23b
@@ -48,17 +46,7 @@ functions:
 
 resources:
   Resources:
-    # 💡 データベースインスタンスの定義
-    MySecurityGroup:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupDescription: Security group for RDS allowing access from Lambda
-        VpcId: ${env:VPC_ID} # 👈 buildspecから渡されるVPC_IDを参照
-        SecurityGroupIngress:
-          - IpProtocol: tcp
-            FromPort: 3306
-            ToPort: 3306
-            SourceSecurityGroupId: sg-0c783dc1db068f8db # 👈 Lambda用のセキュリティグループID
+    # 🚨 削除 🚨 MySecurityGroup リソースは不要なため削除しました。
 
     MyDBSubnetGroup:
       Type: AWS::RDS::DBSubnetGroup
@@ -81,6 +69,5 @@ resources:
         DBName: ${env:DATABASE_NAME}
         DBSubnetGroupName: { Ref: MyDBSubnetGroup }
         
-        # 最終修正: VpcSecurityGroupIds (Ids付き) が正しいプロパティ名
-        VpcSecurityGroupIds: 
-          - !Ref MySecurityGroup
+        # 🚨 削除 🚨 VpcSecurityGroupIds プロパティを削除しました。
+        # LambdaのVPC設定(providerセクション)に任せます。
