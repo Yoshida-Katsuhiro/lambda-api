@@ -5,7 +5,7 @@ env:
     # 必須環境変数
     STAGE: "dev"
     AWS_DEFAULT_REGION: "ap-northeast-1"
-    VPC_ID: "vpc-0c5c87df6f9cc2d81" # 🚨 ここをあなたのVPC IDに修正してください 🚨
+    VPC_ID: "vpc-0c5c87df6f9cc2d81" # 👈 あなたのVPC ID
     
     # DB接続用ダミー変数（serverless.yml の解決に必要）
     DATABASE_USER: "myuser"
@@ -23,12 +23,12 @@ phases:
   build:
     commands:
       - echo Cleaning up previous deployment artifacts...
-      # 以前の手動削除エラー回避のため、removeを先に実行
-      - serverless remove --stage ${STAGE} --region ${AWS_DEFAULT_REGION} --vpc-id ${VPC_ID} --db-user ${DATABASE_USER} --db-password ${DATABASE_PASSWORD} --db-name ${DATABASE_NAME} || true
+      # 🚨 修正点 1: 不要なオプションを削除 🚨
+      - serverless remove --stage ${STAGE} --region ${AWS_DEFAULT_REGION} || true
 
       - echo Deploying via Serverless Framework...
-      # 全ての変数をCLIで渡し、serverless.ymlの変数を解決させる
-      - serverless deploy --stage ${STAGE} --region ${AWS_DEFAULT_REGION} --vpc-id ${VPC_ID} --db-user ${DATABASE_USER} --db-password ${DATABASE_PASSWORD} --db-name ${DATABASE_NAME}
+      # 🚨 修正点 2: 不要なオプションを削除 🚨
+      - serverless deploy --stage ${STAGE} --region ${AWS_DEFAULT_REGION}
 
 # CodePipelineへ成果物を渡す必要がないため、artifactは空
 artifacts:
