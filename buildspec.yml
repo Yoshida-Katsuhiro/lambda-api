@@ -1,5 +1,6 @@
 version: 0.2
 
+
 env:
   variables:
     # 必須環境変数
@@ -8,7 +9,8 @@ env:
     VPC_ID: "vpc-0c5c87df6f9cc2d81" # 👈 あなたのVPC ID
     
     # DB接続用ダミー変数（serverless.yml の解決に必要）
-    DATABASE_USER: "myuser"
+    # 🚨 最終修正点 🚨 MasterUsernameの予約語問題を防ぐため、'appuser'に変更
+    DATABASE_USER: "appuser"
     DATABASE_PASSWORD: "mypassword123"
     DATABASE_NAME: "mydbname"
 
@@ -23,11 +25,9 @@ phases:
   build:
     commands:
       - echo Cleaning up previous deployment artifacts...
-      # 🚨 修正点 1: 不要なオプションを削除 🚨
       - serverless remove --stage ${STAGE} --region ${AWS_DEFAULT_REGION} || true
 
       - echo Deploying via Serverless Framework...
-      # 🚨 修正点 2: 不要なオプションを削除 🚨
       - serverless deploy --stage ${STAGE} --region ${AWS_DEFAULT_REGION}
 
 # CodePipelineへ成果物を渡す必要がないため、artifactは空
