@@ -1,13 +1,19 @@
 service: node-project
 
+custom:
+  # DBのマスターユーザー情報をここで定義。buildspecから渡される
+  dbUser: ${env:DATABASE_USER}
+  dbPassword: ${env:DATABASE_PASSWORD}
+
 provider:
   name: aws
-  runtime: nodejs20.x # Node.jsの最新LTSバージョン
+  runtime: nodejs20.x
   region: ap-northeast-1
   stage: dev
   environment:
-    DATABASE_USER: ${env:DATABASE_USER}
-    DATABASE_PASSWORD: ${env:DATABASE_PASSWORD}
+    # Lambdaの環境変数として利用
+    DATABASE_USER: ${self:custom.dbUser}
+    DATABASE_PASSWORD: ${self:custom.dbPassword}
     DATABASE_HOST: { "Fn::GetAtt": ["MyDatabase", "Endpoint.Address"] }
     DATABASE_NAME: ${env:DATABASE_NAME}
   vpc:
@@ -55,7 +61,7 @@ resources:
       Type: AWS::EC2::SecurityGroup
       Properties:
         GroupDescription: Security group for RDS allowing access from Lambda
-        VpcId: vpc-xxxxxxxxxxxxxxxxx # 以前手動で作ったVPCのIDを指定
+        VpcId: ${env:VPC_ID} # 以前手動で作ったVPCのIDを指定
         SecurityGroupIngress:
           - IpProtocol: tcp             # 接続プロトコル
             FromPort: 3306             # データベースのポート (MySQLなら3306)
@@ -93,4 +99,5 @@ resources:
          #   - { Ref: MySecurityGroup }
          # DBSubnetGroupName: MyDBSubnetGroup      
          DBSubnetGroupName: { Ref: MyDBSubnetGroup }
-        
+         VpcSecurityGroups: 
+          - { Ref: MySecurityGroup } # 👈 MySecurityGroupを参照

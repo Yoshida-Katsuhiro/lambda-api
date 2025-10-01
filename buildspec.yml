@@ -2,36 +2,37 @@ version: 0.2
 
 env:
   variables:
-    # デプロイステージを 'dev' に設定
+    # 必須環境変数
     STAGE: "dev"
-    # AWSリージョンを東京に設定
     AWS_DEFAULT_REGION: "ap-northeast-1"
-
+    VPC_ID: "vpc-0c5c87df6f9cc2d81" # 🚨 ここをあなたのVPC IDに修正してください 🚨
+    
+    # DB接続用ダミー変数（serverless.yml の解決に必要）
+    DATABASE_USER: "myuser"
+    DATABASE_PASSWORD: "mypassword123"
+    DATABASE_NAME: "mydbname"
 
 
 phases:
   install:
     commands:
-      # 1. Node.jsの依存関係をインストール
       - echo Installing Serverless Framework and dependencies...
       - npm install
-      # 2. Serverless Frameworkを安定版のバージョン3系に固定してインストール
-      - npm install -g serverless@3 
-
+      - npm install -g serverless@3
+  
   build:
     commands:
       - echo Cleaning up previous deployment artifacts...
-      # 一度サービスを完全に削除するコマンド（スタックとS3バケットを消す）
-      - serverless remove --stage ${STAGE} --region ${AWS_DEFAULT_REGION} || true 
+      # 以前の手動削除エラー回避のため、removeを先に実行
+      - serverless remove --stage ${STAGE} --region ${AWS_DEFAULT_REGION} --vpc-id ${VPC_ID} --db-user ${DATABASE_USER} --db-password ${DATABASE_PASSWORD} --db-name ${DATABASE_NAME} || true
+
       - echo Deploying via Serverless Framework...
-      - serverless deploy --stage ${STAGE} --region ${AWS_DEFAULT_REGION}
+      # 全ての変数をCLIで渡し、serverless.ymlの変数を解決させる
+      - serverless deploy --stage ${STAGE} --region ${AWS_DEFAULT_REGION} --vpc-id ${VPC_ID} --db-user ${DATABASE_USER} --db-password ${DATABASE_PASSWORD} --db-name ${DATABASE_NAME}
 
-
-      # 2. Serverless Frameworkを使ってRDSとLambdaをデプロイ
-      - echo Deploying via Serverless Framework...
-      - sls deploy --stage dev 
-  
-
+# CodePipelineへ成果物を渡す必要がないため、artifactは空
 artifacts:
   files:
     - '**/*'
+  discard-paths: yes
+  base-directory: .
