@@ -22,48 +22,17 @@ VPC Private Subnet: Lambda関数とRDSデータベースを、外部からのア
 3. データウェアハウス基盤の基礎
 RDSの利用: 分析用途に適したリレーショナルデータベース（PostgreSQL）を選定し、アプリケーションデータの格納基盤としました。
 
-使用技術スタック
-カテゴリ
+使用技術スタック		
+		
+カテゴリ                サービス / 技術	                    役割
+クラウドプロバイダ	    AWS	                                インフラ基盤
+コンピューティング  	AWS Lambda (Node.js 20.x)           APIのビジネスロジック実行
+データベース	        AWS RDS (PostgreSQL)	            トランザクションデータの永続化
+CI/CD	                AWS CodePipeline, AWS CodeBuild	    継続的インテグレーション/デリバリー
+インフラ管理	        Serverless Framework (IaC)	        サーバーレスリソースの定義とデプロイ
+ネットワーク	        AWS VPC, Subnet, Security Group	    セキュアなプライベートネットワーク構築
 
-サービス / 技術
 
-役割
-
-クラウドプロバイダ
-
-AWS
-
-インフラ基盤
-
-コンピューティング
-
-AWS Lambda (Node.js 20.x)
-
-APIのビジネスロジック実行
-
-データベース
-
-AWS RDS (PostgreSQL)
-
-トランザクションデータの永続化
-
-CI/CD
-
-AWS CodePipeline, AWS CodeBuild
-
-継続的インテグレーション/デリバリー
-
-インフラ管理
-
-Serverless Framework (IaC)
-
-サーバーレスリソースの定義とデプロイ
-
-ネットワーク
-
-AWS VPC, Subnet, Security Group
-
-セキュアなプライベートネットワーク構築
 
 環境のデプロイ方法（実行方法）
 （※現在はコスト効率のためリソースを削除済みですが、再構築は可能です）
